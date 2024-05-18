@@ -15,20 +15,21 @@ struct LinkedList {
     current_iter_elem: Option<Rc<RefCell<Node>>>,
 }
 
-
 impl LinkedList {
     fn new() -> Self {
-        Self { head: None, last: None, current_iter_elem: None }
+        Self {
+            head: None,
+            last: None,
+            current_iter_elem: None,
+        }
     }
 
     fn add_before_head(&mut self, value: i32) {
         if self.head.is_none() {
-            self.head = Some(
-                Rc::new(RefCell::new(Node {
-                    data: value,
-                    next: None,
-                }))
-            );
+            self.head = Some(Rc::new(RefCell::new(Node {
+                data: value,
+                next: None,
+            })));
         } else {
             let copy_of_head = Rc::clone(self.head.as_ref().unwrap());
             self.head = Some(Rc::new(RefCell::new(Node {
@@ -59,12 +60,10 @@ impl LinkedList {
 
     fn add_after_tail(&mut self, value: i32) {
         if self.head.is_none() {
-            self.head = Some(
-                Rc::new(RefCell::new(Node {
-                    data: value,
-                    next: None,
-                }))
-            );
+            self.head = Some(Rc::new(RefCell::new(Node {
+                data: value,
+                next: None,
+            })));
             self.current_iter_elem = self.head.clone();
             self.last = self.head.clone();
         } else {
@@ -73,7 +72,10 @@ impl LinkedList {
                 current = node.borrow().next.clone();
                 self.last = Some(node.clone());
             }
-            self.last.as_ref().unwrap().borrow_mut().next = Some(Rc::new(RefCell::new(Node { data: value, next: None })));
+            self.last.as_ref().unwrap().borrow_mut().next = Some(Rc::new(RefCell::new(Node {
+                data: value,
+                next: None,
+            })));
         }
     }
 
@@ -92,7 +94,7 @@ impl LinkedList {
             }
             current = x.next.clone();
         }
-        return (fst, snd);
+        (fst, snd)
     }
 
     fn replace_n_item_with_value(&mut self, mut n: i32, value: i32) {
@@ -128,7 +130,6 @@ impl Iterator for LinkedList {
 }
 
 fn main() {
-
     //добавлять элемент в начало,
     let mut list = LinkedList::new();
     list.add_before_head(3);
@@ -175,7 +176,7 @@ fn main() {
 
     for b in second_part {
         println!("{:?}", b);
-    }// 12 13 14 15
+    } // 12 13 14 15
 
     // Предоставлять возможность изменять элементы списка
     let mut list_edit = LinkedList::new();
