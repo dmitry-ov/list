@@ -57,15 +57,20 @@ impl LinkedList {
                 current = node.borrow().next.clone();
             }
         }
-        let tmp = current.clone().unwrap();
-        let mut ref_mut = tmp.borrow_mut();
-        let tmp_next = ref_mut.next.clone();
 
-        ref_mut.next = Some(Rc::new(RefCell::new(Node {
-            data: value,
-            next: tmp_next,
-        })));
-        Ok(())
+        if current.is_some() {
+            let tmp = current.clone().unwrap();
+            let mut ref_mut = tmp.borrow_mut();
+            let tmp_next = ref_mut.next.clone();
+
+            ref_mut.next = Some(Rc::new(RefCell::new(Node {
+                data: value,
+                next: tmp_next,
+            })));
+            Ok(())
+        } else {
+            Err(format!("can't insert after  item with index {}", index))
+        }
     }
 
     pub fn size(&self) -> i32 {
