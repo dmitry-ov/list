@@ -41,9 +41,9 @@ impl LinkedList {
         }
     }
 
-    fn add_after_n(&mut self, value: i32, index: i32) -> Result<(), String> {
-        if self.head.is_none() || self.size() < index {
-            return Err(format!("no item with index {}", index));
+    fn insert_after_n(&mut self, value: i32, index: i32) -> Result<(), String> {
+        if self.size() < index {
+            return Err(format!("no item with index {index}"));
         }
 
         if self.size() == index {
@@ -58,19 +58,19 @@ impl LinkedList {
             }
         }
 
-        if current.is_some() {
-            let tmp = current.clone().unwrap();
-            let mut ref_mut = tmp.borrow_mut();
-            let tmp_next = ref_mut.next.clone();
+        let Some(cur) = &current else {
+            return Err(format!("can't insert after item with index {index}"));
+        };
 
-            ref_mut.next = Some(Rc::new(RefCell::new(Node {
-                data: value,
-                next: tmp_next,
-            })));
-            Ok(())
-        } else {
-            Err(format!("can't insert after  item with index {}", index))
-        }
+        let tmp = cur.clone();
+        let mut ref_mut = tmp.borrow_mut();
+        let tmp_next = ref_mut.next.clone();
+
+        ref_mut.next = Some(Rc::new(RefCell::new(Node {
+            data: value,
+            next: tmp_next,
+        })));
+        Ok(())
     }
 
     pub fn size(&self) -> i32 {
@@ -183,7 +183,7 @@ fn main() {
     let mut list3 = LinkedList::new();
     list3.push_back(7);
     list3.push_back(9);
-    let _ = list3.add_after_n(8, 1);
+    let _ = list3.insert_after_n(8, 1);
 
     for x in list3.iter() {
         println!("{:?}", x);
@@ -280,24 +280,27 @@ mod tests {
     }
 
     #[test]
-    fn add_after_n() {
+    fn insert_after_n() {
         let mut list = LinkedList::new();
         list.push_back(1);
         list.push_back(2);
         list.push_back(4);
 
-        let result = list.add_after_n(7, 1);
+        let result = list.insert_after_n(7, 1);
         assert!(result.is_ok());
         assert_eq!(4, list.size());
     }
 
     #[test]
-    fn add_after_n_with_empty() {
-        let result_for_empty = LinkedList::new().add_after_n(7, 55);
+    fn insert_after_n_with_empty() {
+        let result_for_empty = LinkedList::new().insert_after_n(7, 55);
         assert_eq!("no item with index 55", result_for_empty.err().unwrap());
 
-        let result = LinkedList::new().add_after_n(7, 0);
+        let result = LinkedList::new().insert_after_n(7, 1);
         assert!(result.is_err());
+
+        let result = LinkedList::new().insert_after_n(7, 0);
+        assert!(result.is_ok());
     }
 
     #[test]
@@ -305,7 +308,7 @@ mod tests {
         let mut l = LinkedList::new();
         l.push_back(1);
         l.push_back(2);
-        let result = l.add_after_n(4, 2);
+        let result = l.insert_after_n(4, 2);
         assert!(result.is_ok());
         assert_eq!(3, l.size());
     }
